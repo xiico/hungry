@@ -157,6 +157,7 @@
         var name = "";
         var p1 = true;
         var clientID = Math.ceil(Math.random() * 1000);
+        var lastMoveId = 0;
 
         var send = "";
 
@@ -419,11 +420,37 @@
         function processServerResponse(data) {
             var response = data.split('¬');
             if (response[0] != "")
-                updateChat(null, { value: response[0] });
-            loadBoard(response[1]);
+                showMessage({ value: response[0] });
+
+            if (response[1] != "")
+                updateChat(null, { value: response[1] });
+
+            loadBoard(response[2]);
         }
         function loadBoard(boardData) {
+            if(boardData != "")
+                for (var y = 0; y < 14; y++) {
+                    for (var x = 0; x < 8; x++) {
+                        tiles[x][y].animal = processTileInfo(boardData[(nColumns*y)+x],tiles[x][y]);
+                    }
+                }
+        }
+        function showMessage(data) {
+            msg.textContent = data.value;
+        }
+        function processTileInfo(char, parent)
+        {
+            var at = "RCDMWLTF";
+            var charb = pad(char.charCodeAt(0).toString(2), 8);
+            if (!charb[2])
+                return null;
 
+            var index = parseInt(charb.substring(5),2);
+            var animal = new Animal(at[index], parent);
+            animal.hidden = charb[4] == 0;
+            animal.p1 = charb[3] == 0;
+
+            return animal;
         }
     </script>
 </body>
