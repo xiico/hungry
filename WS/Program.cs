@@ -12,8 +12,10 @@ namespace WS
         static SqlCeConnection m_dbConnection;
         static volatile string name = string.Empty;
         static volatile int lastReceived = 0;
+        static volatile string msg = string.Empty;
         static void Main(string[] args)
         {
+            //[system message],[chat message],[board]
             bool close = false;
 
             m_dbConnection = new SqlCeConnection(@"Data Source=c:\users\francisco.cnmarao\documents\visual studio 2010\Projects\WS\WS\history.sdf");//Data Source=MyData.sdf;Persist Security Info=False;
@@ -42,27 +44,7 @@ namespace WS
 
             while (true)
             {
-                Thread.Sleep(500);
-                sql = "select count(*) from history where status = 'N'";
-                command.CommandText = sql;
-                command.CommandType = System.Data.CommandType.Text;
-                var messages = command.ExecuteScalar().ToString();
-                if (messages != "0")
-                {
-                    sql = "select * from history where id > " + lastReceived;
-                    command.CommandText = sql;
-                    command.CommandType = System.Data.CommandType.Text;
-                    SqlCeDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Console.WriteLine(reader["name"].ToString() + ": " + reader["message"].ToString());
-                        command.CommandText = sql;
-                        command.CommandType = System.Data.CommandType.Text;
-                        //command.CommandText = "update history set status = 'O' where id = " + reader["id"].ToString();
-                        lastReceived = int.Parse(reader["id"].ToString());
-                        command.ExecuteNonQuery();
-                    }
-                }
+                sql = updateChat(command, sql);
 
 
                 if (close)
@@ -71,6 +53,31 @@ namespace WS
 
         }
 
+        private static string updateChat(SqlCeCommand command, string sql)
+        {
+            Thread.Sleep(500);
+            sql = "select count(*) from history where status = 'N'";
+            command.CommandText = sql;
+            command.CommandType = System.Data.CommandType.Text;
+            var messages = command.ExecuteScalar().ToString();
+            if (messages != "0")
+            {
+                sql = "select * from history where id > " + lastReceived;
+                command.CommandText = sql;
+                command.CommandType = System.Data.CommandType.Text;
+                SqlCeDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Console.WriteLine("¬" + reader["message"].ToString() + "¬");
+                    command.CommandText = sql;
+                    command.CommandType = System.Data.CommandType.Text;
+                    //command.CommandText = "update history set status = 'O' where id = " + reader["id"].ToString();
+                    lastReceived = int.Parse(reader["id"].ToString());
+                    command.ExecuteNonQuery();
+                }
+            }
+            return sql;
+        }
 
 
         static void Listen()
