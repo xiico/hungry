@@ -1,0 +1,430 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>troops</title>
+    <style>
+        .divExternal {
+            float: left;
+            border-style: solid;
+        }
+
+        .bf {
+            border-style: solid;
+            display: inline-block;
+            float: left;
+        }
+
+        .infoPanel {
+            float: right;
+            border-style: solid;
+            width: 200px;
+        }
+
+        .infoBox {
+            height: 140px;
+            border-style: solid;
+            align-content: center;
+            padding: 1px;
+        }
+
+        .chatBox {
+            border-style: solid;
+            height: 245px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        .inputSendChat {
+            width: 100%;
+        }
+
+        .pickTroops tr td {
+            border: 2px solid black;
+            font-family: 'Lucida Console';
+            font-weight: bold;
+            text-align: center;
+            cursor: default;
+        }
+
+        .pickTroops {
+            width: 192px;
+            height: 50px;
+            top: 120px;
+        }
+
+        .start {
+            position: absolute;
+            top: 120px;
+            left: 105px;
+            width: 60px;
+            height: 40px;
+        }
+
+        .divName {
+            position: absolute;
+            top: 120px;
+            left: 45px;
+        }
+
+        .divTroops {
+            display: table-cell;
+            vertical-align: bottom;
+            height: 80px;
+        }
+
+        .animalInfo {
+            font-family: Arial;
+            font-size: 10px;
+        }
+
+        .divInfo{
+            height:22px;
+        }
+    </style>
+</head>
+<body>
+    <div class="divExternal">
+        <div id=" content" class="bf">
+            <input type="button" id="start" value="GO" class="start" onclick="startMatch()" />
+            <div align="center" id="divName" class="divName">
+                <span>Name</span><br />
+                <input type="text" name="name" onkeypress="chooseName(event, this);" />
+            </div>
+            <canvas id="bf" width="80" height="160" onclick="showTileInfo(event)"></canvas>
+        </div>
+        <div class="infoPanel">
+            <div class="infoBox">
+                <div style="height:60px;">
+                    <span id="tileInfo">tileInfo</span><br />
+                    <div id="animalInfo" class="divInfo">
+                        <span class="animalInfo">Animal info</span><br />
+                    </div>
+                    <span id="msg">general info</span><br />
+                    <span id="pName">Your Info</span>
+                </div>
+                <div class="divTroops">
+                    <table id="tblTroops" class="pickTroops" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td onclick="pickClick(this);">R</td>
+                            <td onclick="pickClick(this);">C</td>
+                            <td onclick="pickClick(this);">D</td>
+                            <td onclick="pickClick(this);">M</td>
+                            <td onclick="pickClick(this);">W</td>
+                            <td onclick="pickClick(this);">L</td>
+                            <td onclick="pickClick(this);">T</td>
+                            <td onclick="pickClick(this);">F</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="divChat" class="chatBox">
+            </div>
+            <input class="inputSendChat" type="text" name="msg" value=" " onkeypress="updateChat(event,this);" />
+        </div>
+    </div>
+    <script type="text/javascript">
+        var ws = new WebSocket('ws://localhost:8080/');
+        var tileSize = 30;
+        var bf = document.getElementById('bf');
+        var tileInfo = document.getElementById('tileInfo');
+        var animalInfo = document.getElementById('animalInfo');
+        var divChat = document.getElementById('divChat');
+        var msg = document.getElementById('msg');
+        var tblTroops = document.getElementById('tblTroops');
+        var start = document.getElementById('start');
+        var divName = document.getElementById('divName');
+        var pName = document.getElementById('pName');
+        var nRows = 14;
+        var nColumns = 8;
+        bf.width = tileSize * nColumns;
+        bf.height = tileSize * nRows;
+        var ctx = bf.getContext('2d');
+        var mousex = 0;
+        var mousey = 0;
+        var chosenType = "";
+        var chosenTile = null;
+        var choosing = true;
+        var name = "";
+        var p1 = true;
+        var clientID = Math.ceil(Math.random() * 1000);
+
+        var send = "";
+
+        var tiles = null;
+
+        var troops = new Array(8);
+        var tnames = "RCDMWLTF";
+        var tvalues = "83322141";
+        for (var i = 0; i < 8; i++) {
+            troops[i] = { type: tnames[i], left: tvalues[i] };
+        }
+
+        bf.onmousemove = function (event) {
+            /*if (!tiles)
+                return;*/
+            mousex = event.clientX - bf.offsetLeft;
+            mousey = event.clientY - bf.offsetTop;
+            var col = Math.abs(Math.ceil(mousex / tileSize) + (p1 ? 0 : -(nColumns + 1)));
+            var row = Math.abs(Math.ceil(mousey / tileSize) + (p1 ? 0 : -(nRows + 1)));
+            tileInfo.innerText = "[" + ((col + "").length - 1 ? "" : "0") + col + "][" + ((row + "").length - 1 ? "" : "0") + row + "]";
+        }
+
+        ws.onmessage = function (event) {
+            processServerResponse(event.data);
+        };
+
+        function Tile() {
+            self = this;
+            self.size = tileSize;
+            self.borderColor = '#202020';
+            self.frameColor = '#909090';
+            self.centerColor = '#b0b0b0';
+            self.x = 0;
+            self.y = 0;
+            self.col = function () { self = this; return Math.abs(Math.ceil(self.x + 1 / tileSize) + (p1 ? 0 : -(nColumns + 1))); };
+            self.row = function () { self = this; return Math.abs(Math.ceil(self.y + 1 / tileSize) + (p1 ? 0 : -(nColumns + 1))); };
+            self.animal = null;
+            self.selected = false;
+            self.Draw = function () {
+                self = this;
+                //drawborder
+                ctx.fillStyle = self.borderColor;
+                ctx.fillRect(self.x, self.y, self.size, self.size);
+                ctx.fillStyle = self.frameColor;
+                ctx.fillRect(self.x + 1, self.y + 1, self.size - 2, self.size - 2);
+                ctx.fillStyle = self.centerColor;
+                ctx.fillRect(self.x + 4, self.y + 4, self.size - 8, self.size - 8);
+
+                if (self.animal)
+                    self.animal.Draw();
+            }
+        }
+        function Animal(type, obj) {
+            //Types:R,C,D,M,W,L,T,F
+            self = this;
+            self.type = type;
+            self.parent = obj;
+            self.hidden = false;
+            self.p1 = true;
+            self.x = self.parent.x + 7 + (type == 'W' ? -2 : 0) + (type == 'T' ? 2 : 0) + (type == 'F' ? 1 : 0) + (type == 'L' ? 1 : 0) + (type == 'M' ? -1 : 0);
+            self.y = self.parent.y + 22;
+            self.power = function () {
+                self = this;
+                switch (self.type) {
+                    case 'R'://rat - 8
+                        return 1;
+                    case 'C'://cat - 3
+                        return 2;
+                    case 'D'://dog - 3
+                        return 4;
+                    case 'M'://monkey - 2
+                        return 5;
+                    case 'W'://wolf - 2
+                        return 7;
+                    case 'L'://lion - 1
+                        return 10;
+                    case 'T'://trap - 4
+                    case 'F'://food - 1
+                    default:
+                        return 0;
+                }
+            }
+            self.Draw = function () {
+                self = this;
+                ctx.fillStyle = self.parent.selected ? "#1010ff" : "#000000";
+                ctx.font = "20px Verdana";
+                ctx.fillText((!self.hidden || self.p1 == p1 ?self.type:"#"), self.x, self.y);
+            }
+        }
+        function CreateTiles() {
+            tiles = new Array(nRows);
+            for (var i = 0; i < nColumns; i++) {
+                tiles[i] = new Array(nRows);
+            }
+        }
+        window.setInterval('main()', 33);
+        function main() {
+            var startColumn = 0;
+            var startRow = 0;
+            if (name != "" && !tiles)
+                CreateTiles();
+
+            if (!p1) {
+                startColumn = nColumns;
+                startRow = nRows;
+            }
+
+            if (tiles)
+                for (var y = (p1 ? startRow : startRow - 1) ; (p1 ? y < nRows : y >= 0) ; (p1 ? y++ : y--)) {
+                    for (var x = (p1 ? startColumn : startColumn - 1) ; (p1 ? x < nColumns : x >= 0) ; (p1 ? x++ : x--)) {
+                        if (!tiles[x][y]) {
+                            tiles[x][y] = new Tile();
+                            tiles[x][y].x = Math.abs(x + (p1 ? 0 : -(nColumns-1))) * tileSize;
+                            tiles[x][y].y = Math.abs(y + (p1 ? 0 : -(nRows-1))) * tileSize;
+                        }
+                        tiles[x][y].Draw();
+                    }
+                }
+
+            //update tvalues
+            for (var i = 0; i < 8; i++) {
+                tblTroops.rows[0].cells[i].textContent = troops[i].left;
+            }
+
+            //show chosen type
+            msg.textContent = chosenType;
+            var canStart = 0;
+            for (var i = 0; i < 8; i++) {
+                canStart += troops[i].left;
+            }
+            start.disabled = canStart != 0;
+            start.style.display = (choosing && name != "" ? "block" : "none");
+            tblTroops.style.display = (choosing ? "block" : "none");
+            divName.style.display = (name == "" ? "block" : "none");
+            pName.textContent = name;
+            showChosenInfo();
+
+        }
+        function showTileInfo(e) {
+            var col = Math.abs(Math.ceil(mousex / tileSize) + (p1 ? 0 : -(nColumns + 1)));
+            var row = Math.abs(Math.ceil(mousey / tileSize) + (p1 ? 0 : -(nRows + 1)));
+
+            if (chosenTile && chosenTile != tiles[col - 1][row - 1]) chosenTile.selected = false;
+            chosenTile = tiles[col - 1][row - 1];
+            if (chosenTile.animal) chosenType = chosenTile.animal.type;
+            if ((p1?row > 11:row<4) && choosing && chosenType != "") {
+                var cat = chosenAnimalType();
+                if (!chosenTile.animal) {
+                    chosenTile.animal = new Animal(chosenType, chosenTile);
+                    cat.left--;
+                    if (cat.left == 0) {
+                        chosenType = "";
+                    }
+                } else {
+                    chosenType = chosenTile.animal.type;
+                    cat.left++;
+                    chosenTile.animal = null;
+                }
+            }
+            else if (!choosing)
+                chosenTile.selected = !chosenTile.selected;
+        }
+        function chosenAnimalType() {
+            for (var i = 0; i < 8; i++) {
+                {
+                    if (chosenType == troops[i].type) {
+                        return troops[i];
+                    }
+                }
+            }
+        }
+        function updateChat(e, obj) {
+            if (e && e.charCode != 13)
+                return;
+
+            divChat.innerHTML += '<span>' + obj.value + '</span><br>';
+            obj.value = "";
+            divChat.scrollTop = divChat.scrollHeight;
+        }
+        function chooseName(e, obj) {
+            if (e.charCode != 13)
+                return;
+
+            name = obj.value;
+        }
+        function pickClick(obj) {
+            if (!choosing)
+                return false;
+
+            if (troops[obj.cellIndex].left > 0 && chosenType != obj.textContent) {
+                chosenType = obj.textContent;
+            }
+            else
+                chosenType = "";
+        }
+        function showChosenInfo() {
+            if (chosenTile && chosenTile.animal && chosenTile.selected) {
+                var tag = '<span class="animalInfo">';
+                var info = tag + "Type: " + chosenTile.animal.type + "</span><br>";
+                info += tag + "Power: " + chosenTile.animal.power() + "</span><br>";
+                animalInfo.innerHTML = info;
+            }
+            else
+            {
+                animalInfo.innerHTML = '<span class="animalInfo">Animal info</span><br />';
+            }
+        }
+        function ConvertTileToChar(tile) {
+            var toServer = "00100000";
+            if (tile) {
+                var atype = "000";
+                tile.animal
+                var tnames = "RCDMWLTF";
+                if (tile.animal) {
+                    for (var i = 0; i < 8; i++) {
+                        if (tile.animal.type == tnames[i])
+                            atype = pad(i.toString(2), 3);
+                    }
+                    toServer = atype;
+                    toServer = (p1 ? "1" : "0") + toServer;
+                    toServer = tile.animal.hidden ? "1" : "0";
+                    toServer = "1" + toServer;
+                }
+                else
+                    toServer = "000" + atype;
+
+                if (toServer == "111111")
+                    toServer = "10" + toServer;
+                else
+                    toServer = "01" + toServer;
+            }
+            return String.fromCharCode(parseInt(toServer, 2));
+        }
+        function pad(n, width, z) {
+            z = z || '0';
+            n = n + '';
+            return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+        }
+        function startMatch() {
+            choosing = false;
+            send =  clientID + "¬";
+            send += (p1 ? "1" : "0") + "¬";
+            send += "¬";//msg
+            send += ConvertTileToChar(chosenTile) + "¬";
+            send += convertChosenToChars();
+        }
+        function convertChosenToChars() {
+            var result = "";
+            var startColumn = 0;
+            var startRow = 0;
+            for (var y = (p1 ? startRow : startRow - 1) ; (p1 ? y < nRows : y >= 0) ; (p1 ? y++ : y--)) {
+                for (var x = (p1 ? startColumn : startColumn - 1) ; (p1 ? x < nColumns : x >= 0) ; (p1 ? x++ : x--)) {
+                    if (tiles[x][y].animal) {
+                        result += ConvertTileToChar(tiles[x][y]);
+                    }
+                }
+            }
+            return result;
+        }
+        function processServerResponse(data) {
+            var response = data.split('¬');
+            if (response[0] != "")
+                updateChat(null, { value: response[0] });
+            loadBoard(response[1]);
+        }
+        function loadBoard(boardData) {
+
+        }
+    </script>
+</body>
+</html>
