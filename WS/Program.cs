@@ -82,17 +82,18 @@ namespace WS
 
         static void Listen()
         {
+            //[ClientID],[Number],[chat message],[move],[start]
             while (true)
             {
                 string sql;
-                string msg = Console.ReadLine();
+                string rcvd = Console.ReadLine();
 
-                if (name == string.Empty)
-                    name = msg;
-
-                sql = "insert into history(ClientID,name,message,status) values (" + System.Diagnostics.Process.GetCurrentProcess().Id + ",'" + name + "','" + msg + "','N')";
-                SqlCeCommand command = new SqlCeCommand(sql, m_dbConnection);
-                command.ExecuteNonQuery();
+                if (rcvd.Split('¬')[2] != "")
+                {
+                    sql = "insert into history(ClientID,name,message,status) values (" + System.Diagnostics.Process.GetCurrentProcess().Id + ",'" + name + "','" + msg + "','N')";
+                    SqlCeCommand command = new SqlCeCommand(sql, m_dbConnection);
+                    command.ExecuteNonQuery();
+                }
             }
         }
     }

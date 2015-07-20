@@ -403,6 +403,7 @@
             send += "¬";//msg
             send += ConvertTileToChar(chosenTile) + "¬";
             send += convertChosenToChars();
+            ws.send(send);
         }
         function convertChosenToChars() {
             var result = "";
