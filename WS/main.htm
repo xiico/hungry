@@ -80,6 +80,17 @@
         .divInfo{
             height:22px;
         }
+
+        .joinCreateSession{
+            position: absolute;
+            top: 120px;
+            left: 45px;
+        }
+
+        .listSession{
+            width:120px;
+            text-align:center;
+        }
     </style>
 </head>
 <body>
@@ -101,6 +112,14 @@
                     </div>
                     <span id="msg">general info</span><br />
                     <span id="pName">Your Info</span>
+                    <div id="divJoinCreateSession" class="joinCreateSession">
+                        <select id="lstSessions" size="8" class="listSession">
+                            <option value="value">text</option>
+                        </select>
+                        <input type="button" id="btnCreateSession" value="Create" onclick="joinOrCreateSession('C');" />
+                        <input type="button" id="btnJoinSession" value="Join" onclick="joinOrCreateSession('J')"; />
+                        <input type="button" id="btnUpdate" value="Update" onclick="joinOrCreateSession()" ; />
+                    </div>
                 </div>
                 <div class="divTroops">
                     <table id="tblTroops" class="pickTroops" cellpadding="0" cellspacing="0">
@@ -144,6 +163,8 @@
         var start = document.getElementById('start');
         var divName = document.getElementById('divName');
         var pName = document.getElementById('pName');
+        var divJoinCreateSession = document.getElementById('divJoinCreateSession');
+        var lstSessions = document.getElementById('lstSessions');
         var nRows = 14;
         var nColumns = 8;
         bf.width = tileSize * nColumns;
@@ -158,6 +179,7 @@
         var p1 = true;
         var clientID = Math.ceil(Math.random() * 1000);
         var lastMoveId = 0;
+        var sessionID = null;
 
         var send = "";
 
@@ -168,6 +190,13 @@
         var tvalues = "83322141";
         for (var i = 0; i < 8; i++) {
             troops[i] = { type: tnames[i], left: tvalues[i] };
+        }
+
+        if (typeof String.prototype.startsWith != 'function') {
+            // see below for better implementation!
+            String.prototype.startsWith = function (str){
+                return this.indexOf(str) === 0;
+            };
         }
 
         bf.onmousemove = function (event) {
@@ -183,6 +212,20 @@
         ws.onmessage = function (event) {
             processServerResponse(event.data);
         };
+
+        function joinOrCreateSession(option) {
+            //[clientID],[pNumber],[msg],[move],[startboard]
+            if (option == "J") {
+
+            }
+            else
+                if (option == "C") {
+
+                }
+                else {
+                    ws.send("¬¬lst¬¬")
+                }
+        }
 
         function Tile() {
             self = this;
@@ -294,6 +337,7 @@
             divName.style.display = (name == "" ? "block" : "none");
             pName.textContent = name;
             showChosenInfo();
+            divJoinCreateSession.style.display = (!sessionID ? "block" : "none");
 
         }
         function showTileInfo(e) {
@@ -397,6 +441,7 @@
             return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
         }
         function startMatch() {
+            //[clientID],[pNumber],[msg],[move],[startboard]
             choosing = false;
             send =  clientID + "¬";
             send += (p1 ? "1" : "0") + "¬";
@@ -419,14 +464,33 @@
             return result;
         }
         function processServerResponse(data) {
+            //[system message],[message],[board]
             var response = data.split('¬');
             if (response[0] != "")
                 showMessage({ value: response[0] });
 
-            if (response[1] != "")
-                updateChat(null, { value: response[1] });
+            if (response[1] != "") {
+                switch (response[1]) {
+                    case "cht:":
+                        updateChat(null, { value: response[1].substring(4) });
+                        break
+                    case "lst:":
+                        var rsp = response[1].substring(4);
+                        var item = { text: rsp.split(';')[0], value: rsp.split(';')[1] };
+                        updateSessionList(item);
+                        break;
+                    default:
+
+                }
+            }
 
             loadBoard(response[2]);
+        }
+        function updateSessionList(item){
+            var opt = lstSessions.creatElement("option");
+            opt.text = item.text;
+            opt.value = item.value;
+            lstSessions.add(opt);
         }
         function loadBoard(boardData) {
             if(boardData != "")

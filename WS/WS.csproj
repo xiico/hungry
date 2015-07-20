@@ -72,6 +72,7 @@
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="model.edmx.sqlce" />
     <None Include="resources\CHANGES" />
     <None Include="resources\LICENSE" />
     <None Include="resources\README.md" />

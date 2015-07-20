@@ -6,8 +6,19 @@
     <edmx:StorageModels>
     <Schema Namespace="historyModel.Store" Alias="Self" Provider="System.Data.SqlServerCe.3.5" ProviderManifestToken="3.5" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
         <EntityContainer Name="historyModelStoreContainer">
+          <EntitySet Name="board" EntityType="historyModel.Store.board" store:Type="Tables" />
           <EntitySet Name="history" EntityType="historyModel.Store.history" store:Type="Tables" />
+          <EntitySet Name="requests" EntityType="historyModel.Store.requests" store:Type="Tables" />
+          <EntitySet Name="Session" EntityType="historyModel.Store.Session" store:Type="Tables" />
         </EntityContainer>
+        <EntityType Name="board">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="positions" Type="nvarchar" MaxLength="400" />
+          <Property Name="sessionId" Type="int" />
+        </EntityType>
         <EntityType Name="history">
           <Key>
             <PropertyRef Name="id" />
@@ -18,13 +29,44 @@
           <Property Name="status" Type="nchar" MaxLength="100" />
           <Property Name="clientID" Type="int" />
         </EntityType>
+        <EntityType Name="requests">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="clientID" Type="int" />
+          <Property Name="request" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Session">
+          <Key>
+            <PropertyRef Name="sessionId" />
+          </Key>
+          <Property Name="sessionId" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="clientID1" Type="int" />
+          <Property Name="clientID2" Type="int" />
+          <Property Name="startPos1" Type="nvarchar" MaxLength="100" />
+          <Property Name="startPos2" Type="nvarchar" MaxLength="100" />
+          <Property Name="status" Type="nvarchar" MaxLength="100" />
+          <Property Name="name" Type="nvarchar" MaxLength="100" />
+        </EntityType>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="historyModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
         <EntityContainer Name="historyEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="board" EntityType="historyModel.board" />
           <EntitySet Name="history" EntityType="historyModel.history" />
+          <EntitySet Name="requests" EntityType="historyModel.requests" />
+          <EntitySet Name="Session" EntityType="historyModel.Session" />
         </EntityContainer>
+        <EntityType Name="board">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="positions" MaxLength="400" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="sessionId" />
+        </EntityType>
         <EntityType Name="history">
           <Key>
             <PropertyRef Name="id" />
@@ -35,12 +77,41 @@
           <Property Type="String" Name="status" MaxLength="100" FixedLength="true" Unicode="true" />
           <Property Type="Int32" Name="clientID" />
         </EntityType>
+        <EntityType Name="requests">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int32" Name="id" Nullable="false" />
+          <Property Type="Int32" Name="clientID" />
+          <Property Type="String" Name="request" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Session">
+          <Key>
+            <PropertyRef Name="sessionId" />
+          </Key>
+          <Property Type="Int32" Name="sessionId" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="clientID1" />
+          <Property Type="Int32" Name="clientID2" />
+          <Property Type="String" Name="startPos1" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="startPos2" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="status" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="name" MaxLength="100" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="historyModelStoreContainer" CdmEntityContainer="historyEntities" >
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="historyModelStoreContainer" CdmEntityContainer="historyEntities">
+          <EntitySetMapping Name="board">
+            <EntityTypeMapping TypeName="historyModel.board">
+              <MappingFragment StoreEntitySet="board">
+                <ScalarProperty Name="sessionId" ColumnName="sessionId" />
+                <ScalarProperty Name="positions" ColumnName="positions" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="history">
             <EntityTypeMapping TypeName="historyModel.history">
               <MappingFragment StoreEntitySet="history">
@@ -52,9 +123,30 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="requests">
+            <EntityTypeMapping TypeName="historyModel.requests">
+              <MappingFragment StoreEntitySet="requests">
+                <ScalarProperty Name="request" ColumnName="request" />
+                <ScalarProperty Name="clientID" ColumnName="clientID" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Session">
+            <EntityTypeMapping TypeName="historyModel.Session">
+              <MappingFragment StoreEntitySet="Session">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="startPos2" ColumnName="startPos2" />
+                <ScalarProperty Name="startPos1" ColumnName="startPos1" />
+                <ScalarProperty Name="clientID2" ColumnName="clientID2" />
+                <ScalarProperty Name="clientID1" ColumnName="clientID1" />
+                <ScalarProperty Name="sessionId" ColumnName="sessionId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
+</Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
   <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
@@ -73,7 +165,10 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram Name="model" >
-        <EntityTypeShape EntityType="historyModel.history" Width="1.5" PointX="0.75" PointY="0.75" Height="1.9802864583333335" />
+        <EntityTypeShape EntityType="historyModel.board" Width="1.5" PointX="0.75" PointY="0.75" Height="1.5956835937499996" />
+        <EntityTypeShape EntityType="historyModel.history" Width="1.5" PointX="2.75" PointY="0.75" Height="1.9802864583333326" />
+        <EntityTypeShape EntityType="historyModel.requests" Width="1.5" PointX="6.75" PointY="0.75" Height="1.5956835937499996" />
+        <EntityTypeShape EntityType="historyModel.Session" Width="1.5" PointX="4.75" PointY="0.75" Height="2.3648893229166674" />
       </Diagram>
     </Diagrams>
   </Designer>

@@ -68,6 +68,22 @@ namespace WS
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
+        public ObjectSet<board> board
+        {
+            get
+            {
+                if ((_board == null))
+                {
+                    _board = base.CreateObjectSet<board>("board");
+                }
+                return _board;
+            }
+        }
+        private ObjectSet<board> _board;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
         public ObjectSet<history> history
         {
             get
@@ -80,10 +96,50 @@ namespace WS
             }
         }
         private ObjectSet<history> _history;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<requests> requests
+        {
+            get
+            {
+                if ((_requests == null))
+                {
+                    _requests = base.CreateObjectSet<requests>("requests");
+                }
+                return _requests;
+            }
+        }
+        private ObjectSet<requests> _requests;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<Session> Session
+        {
+            get
+            {
+                if ((_Session == null))
+                {
+                    _Session = base.CreateObjectSet<Session>("Session");
+                }
+                return _Session;
+            }
+        }
+        private ObjectSet<Session> _Session;
 
         #endregion
 
         #region AddTo Methods
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the board EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToboard(board board)
+        {
+            base.AddObject("board", board);
+        }
     
         /// <summary>
         /// Deprecated Method for adding a new object to the history EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
@@ -91,6 +147,22 @@ namespace WS
         public void AddTohistory(history history)
         {
             base.AddObject("history", history);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the requests EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddTorequests(requests requests)
+        {
+            base.AddObject("requests", requests);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the Session EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToSession(Session session)
+        {
+            base.AddObject("Session", session);
         }
 
         #endregion
@@ -100,6 +172,111 @@ namespace WS
     #endregion
 
     #region Entities
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="historyModel", Name="board")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class board : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new board object.
+        /// </summary>
+        /// <param name="id">Initial value of the id property.</param>
+        public static board Createboard(global::System.Int32 id)
+        {
+            board board = new board();
+            board.id = id;
+            return board;
+        }
+
+        #endregion
+
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                if (_id != value)
+                {
+                    OnidChanging(value);
+                    ReportPropertyChanging("id");
+                    _id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("id");
+                    OnidChanged();
+                }
+            }
+        }
+        private global::System.Int32 _id;
+        partial void OnidChanging(global::System.Int32 value);
+        partial void OnidChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String positions
+        {
+            get
+            {
+                return _positions;
+            }
+            set
+            {
+                OnpositionsChanging(value);
+                ReportPropertyChanging("positions");
+                _positions = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("positions");
+                OnpositionsChanged();
+            }
+        }
+        private global::System.String _positions;
+        partial void OnpositionsChanging(global::System.String value);
+        partial void OnpositionsChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> sessionId
+        {
+            get
+            {
+                return _sessionId;
+            }
+            set
+            {
+                OnsessionIdChanging(value);
+                ReportPropertyChanging("sessionId");
+                _sessionId = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("sessionId");
+                OnsessionIdChanged();
+            }
+        }
+        private Nullable<global::System.Int32> _sessionId;
+        partial void OnsessionIdChanging(Nullable<global::System.Int32> value);
+        partial void OnsessionIdChanged();
+
+        #endregion
+
+    
+    }
     
     /// <summary>
     /// No Metadata Documentation available.
@@ -248,6 +425,312 @@ namespace WS
         private Nullable<global::System.Int32> _clientID;
         partial void OnclientIDChanging(Nullable<global::System.Int32> value);
         partial void OnclientIDChanged();
+
+        #endregion
+
+    
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="historyModel", Name="requests")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class requests : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new requests object.
+        /// </summary>
+        /// <param name="id">Initial value of the id property.</param>
+        public static requests Createrequests(global::System.Int32 id)
+        {
+            requests requests = new requests();
+            requests.id = id;
+            return requests;
+        }
+
+        #endregion
+
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                if (_id != value)
+                {
+                    OnidChanging(value);
+                    ReportPropertyChanging("id");
+                    _id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("id");
+                    OnidChanged();
+                }
+            }
+        }
+        private global::System.Int32 _id;
+        partial void OnidChanging(global::System.Int32 value);
+        partial void OnidChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> clientID
+        {
+            get
+            {
+                return _clientID;
+            }
+            set
+            {
+                OnclientIDChanging(value);
+                ReportPropertyChanging("clientID");
+                _clientID = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("clientID");
+                OnclientIDChanged();
+            }
+        }
+        private Nullable<global::System.Int32> _clientID;
+        partial void OnclientIDChanging(Nullable<global::System.Int32> value);
+        partial void OnclientIDChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String request
+        {
+            get
+            {
+                return _request;
+            }
+            set
+            {
+                OnrequestChanging(value);
+                ReportPropertyChanging("request");
+                _request = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("request");
+                OnrequestChanged();
+            }
+        }
+        private global::System.String _request;
+        partial void OnrequestChanging(global::System.String value);
+        partial void OnrequestChanged();
+
+        #endregion
+
+    
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="historyModel", Name="Session")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class Session : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new Session object.
+        /// </summary>
+        /// <param name="sessionId">Initial value of the sessionId property.</param>
+        public static Session CreateSession(global::System.Int32 sessionId)
+        {
+            Session session = new Session();
+            session.sessionId = sessionId;
+            return session;
+        }
+
+        #endregion
+
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int32 sessionId
+        {
+            get
+            {
+                return _sessionId;
+            }
+            set
+            {
+                if (_sessionId != value)
+                {
+                    OnsessionIdChanging(value);
+                    ReportPropertyChanging("sessionId");
+                    _sessionId = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("sessionId");
+                    OnsessionIdChanged();
+                }
+            }
+        }
+        private global::System.Int32 _sessionId;
+        partial void OnsessionIdChanging(global::System.Int32 value);
+        partial void OnsessionIdChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> clientID1
+        {
+            get
+            {
+                return _clientID1;
+            }
+            set
+            {
+                OnclientID1Changing(value);
+                ReportPropertyChanging("clientID1");
+                _clientID1 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("clientID1");
+                OnclientID1Changed();
+            }
+        }
+        private Nullable<global::System.Int32> _clientID1;
+        partial void OnclientID1Changing(Nullable<global::System.Int32> value);
+        partial void OnclientID1Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> clientID2
+        {
+            get
+            {
+                return _clientID2;
+            }
+            set
+            {
+                OnclientID2Changing(value);
+                ReportPropertyChanging("clientID2");
+                _clientID2 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("clientID2");
+                OnclientID2Changed();
+            }
+        }
+        private Nullable<global::System.Int32> _clientID2;
+        partial void OnclientID2Changing(Nullable<global::System.Int32> value);
+        partial void OnclientID2Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String startPos1
+        {
+            get
+            {
+                return _startPos1;
+            }
+            set
+            {
+                OnstartPos1Changing(value);
+                ReportPropertyChanging("startPos1");
+                _startPos1 = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("startPos1");
+                OnstartPos1Changed();
+            }
+        }
+        private global::System.String _startPos1;
+        partial void OnstartPos1Changing(global::System.String value);
+        partial void OnstartPos1Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String startPos2
+        {
+            get
+            {
+                return _startPos2;
+            }
+            set
+            {
+                OnstartPos2Changing(value);
+                ReportPropertyChanging("startPos2");
+                _startPos2 = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("startPos2");
+                OnstartPos2Changed();
+            }
+        }
+        private global::System.String _startPos2;
+        partial void OnstartPos2Changing(global::System.String value);
+        partial void OnstartPos2Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                OnstatusChanging(value);
+                ReportPropertyChanging("status");
+                _status = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("status");
+                OnstatusChanged();
+            }
+        }
+        private global::System.String _status;
+        partial void OnstatusChanging(global::System.String value);
+        partial void OnstatusChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                OnnameChanging(value);
+                ReportPropertyChanging("name");
+                _name = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("name");
+                OnnameChanged();
+            }
+        }
+        private global::System.String _name;
+        partial void OnnameChanging(global::System.String value);
+        partial void OnnameChanged();
 
         #endregion
 

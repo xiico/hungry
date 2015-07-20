@@ -15,11 +15,11 @@ namespace WS
         static volatile string msg = string.Empty;
         static void Main(string[] args)
         {
-            //[system message],[chat message],[board]
+            //[system message],[message],[board]
             bool close = false;
 
             m_dbConnection = new SqlCeConnection(@"Data Source=c:\users\francisco.cnmarao\documents\visual studio 2010\Projects\WS\WS\history.sdf");//Data Source=MyData.sdf;Persist Security Info=False;
-            
+
             SqlCeCommand command;
             string sql = string.Empty;
             try
@@ -82,17 +82,30 @@ namespace WS
 
         static void Listen()
         {
-            //[ClientID],[Number],[chat message],[move],[start]
+            //[ClientID],[pNumber],[msg],[move],[start board]
             while (true)
             {
                 string sql;
                 string rcvd = Console.ReadLine();
 
-                if (rcvd.Split('¬')[2] != "")
+                if (rcvd.Split('¬')[2].StartsWith("cht:"))
                 {
-                    sql = "insert into history(ClientID,name,message,status) values (" + System.Diagnostics.Process.GetCurrentProcess().Id + ",'" + name + "','" + msg + "','N')";
+                    sql = "insert into history(ClientID,name,message,status) values (" + System.Diagnostics.Process.GetCurrentProcess().Id + ",'" + name + "','" + msg.Substring(4) + "','N')";
                     SqlCeCommand command = new SqlCeCommand(sql, m_dbConnection);
                     command.ExecuteNonQuery();
+                }
+
+                if (rcvd.Split('¬')[2].StartsWith("lst:"))
+                {
+                    sql = "SELECT * FROM Session where clientID2 is null";
+                    SqlCeCommand command = new SqlCeCommand(sql, m_dbConnection);
+                    command.CommandText = sql;
+                    command.CommandType = System.Data.CommandType.Text;
+                    SqlCeDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Console.WriteLine("¬" + reader["message"].ToString() + "¬");
+                    }
                 }
             }
         }
